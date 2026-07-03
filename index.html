@@ -102,7 +102,7 @@
         @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -30px) scale(1.05); } 66% { transform: translate(-20px, 20px) scale(0.95); } }
         .app-shell { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
         .top-bar { position: sticky; top: 0; z-index: 100; background: var(--bg-glass); backdrop-filter: blur(20px) saturate(1.2); border-bottom: 1px solid var(--border-subtle); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
-        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; cursor: pointer; text-decoration: none; color: inherit; }
         .logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, var(--accent-primary), #8b5cf6); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); }
         .top-bar-actions { display: flex; align-items: center; gap: 8px; }
         .main-content { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 32px 24px 60px; }
@@ -278,11 +278,11 @@
     </div>
     <div class="app-shell">
         <header class="top-bar" role="banner">
-            <div class="logo">
+            <a href="/" class="logo" aria-label="BarCode Studio Home">
                 <div class="logo-icon" aria-hidden="true"><i data-lucide="scan-barcode"></i></div>
                 <span>BarCode Studio</span>
                 <span class="badge badge-primary">PRO</span>
-            </div>
+            </a>
             <div class="top-bar-actions">
                 <button class="btn-icon" id="shortcuts-btn" title="Keyboard Shortcuts" aria-label="Keyboard Shortcuts"><i data-lucide="keyboard"></i></button>
                 <button class="btn-icon" id="theme-toggle" title="Toggle Theme" aria-label="Toggle Theme">
