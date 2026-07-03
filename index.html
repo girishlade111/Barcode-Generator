@@ -1,340 +1,1716 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Barcode Generator with Theme Switching</title>
-    
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- bwip-js for barcode generation -->
-    <script src="https://cdn.jsdelivr.net/npm/bwip-js@4.3.0/dist/bwip-js.min.js"></script>
+    <title>BarCode Studio — Professional Barcode Generator</title>
+    <meta name="description" content="Enterprise-grade barcode generator supporting QR Code, Code 128, EAN-13, UPC-A, and more. Export as PNG, SVG, or print directly.">
 
-    <!-- Google Fonts: Inter -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- bwip-js -->
+    <script src="https://cdn.jsdelivr.net/npm/bwip-js@4.3.0/dist/bwip-js.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <style>
-        /* Custom styles for the page and sparkle effect */
+        :root {
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Dark Theme (Default) */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a26;
+            --bg-elevated: #22222e;
+            --bg-hover: #2a2a38;
+            --bg-active: #32324a;
+            --bg-glass: rgba(18, 18, 26, 0.8);
+
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-default: rgba(255, 255, 255, 0.1);
+            --border-strong: rgba(255, 255, 255, 0.15);
+            --border-focus: #6366f1;
+
+            --text-primary: #f1f1f4;
+            --text-secondary: #a1a1b5;
+            --text-tertiary: #6b6b80;
+            --text-inverse: #0a0a0f;
+
+            --accent-primary: #6366f1;
+            --accent-primary-hover: #818cf8;
+            --accent-primary-subtle: rgba(99, 102, 241, 0.12);
+            --accent-success: #22c55e;
+            --accent-success-subtle: rgba(34, 197, 94, 0.12);
+            --accent-warning: #f59e0b;
+            --accent-warning-subtle: rgba(245, 158, 11, 0.12);
+            --accent-danger: #ef4444;
+            --accent-danger-subtle: rgba(239, 68, 68, 0.12);
+            --accent-info: #06b6d4;
+            --accent-info-subtle: rgba(6, 182, 212, 0.12);
+
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+
+            --transition-fast: 120ms ease;
+            --transition-base: 200ms ease;
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8f8fc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f0f0f6;
+            --bg-elevated: #ffffff;
+            --bg-hover: #e8e8f0;
+            --bg-active: #dddde8;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+
+            --border-subtle: rgba(0, 0, 0, 0.05);
+            --border-default: rgba(0, 0, 0, 0.1);
+            --border-strong: rgba(0, 0, 0, 0.15);
+            --border-focus: #6366f1;
+
+            --text-primary: #111118;
+            --text-secondary: #555568;
+            --text-tertiary: #8888a0;
+            --text-inverse: #f1f1f4;
+
+            --accent-primary: #4f46e5;
+            --accent-primary-hover: #6366f1;
+            --accent-primary-subtle: rgba(79, 70, 229, 0.08);
+            --accent-success: #16a34a;
+            --accent-success-subtle: rgba(22, 163, 74, 0.08);
+            --accent-warning: #d97706;
+            --accent-warning-subtle: rgba(217, 119, 6, 0.08);
+            --accent-danger: #dc2626;
+            --accent-danger-subtle: rgba(220, 38, 38, 0.08);
+            --accent-info: #0891b2;
+            --accent-info-subtle: rgba(8, 145, 178, 0.08);
+
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+            --shadow-glow: 0 0 30px rgba(79, 70, 229, 0.08);
+        }
+
+        /* Reset */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
         body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background-color var(--transition-slow), color var(--transition-slow);
+            overflow-x: hidden;
         }
 
-        /* --- Dark Theme (Default) --- */
-        body {
-            background-color: #111827; /* Dark gray background */
-            color: #f3f4f6;
-        }
-
-        .card {
-            background-color: rgba(17, 24, 39, 0.5); /* bg-gray-900/50 */
-            backdrop-filter: blur(4px);
-            border-color: #374151; /* gray-700 */
-        }
-        
-        .form-input, .form-select {
-            background-color: #374151; /* gray-700 */
-            border-color: #4b5563; /* gray-600 */
-            color: #f3f4f6;
-        }
-
-        .form-input:focus, .form-select:focus {
-            --tw-ring-color: #3b82f6;
-            border-color: #3b82f6;
-        }
-
-        .header-text { color: #ffffff; }
-        .subheader-text { color: #9ca3af; } /* gray-400 */
-        .barcode-display-bg { background-color: rgba(17, 24, 39, 0.5); border-color: #374151; }
-        .message-box-bg { background-color: #1f2937; } /* gray-800 */
-
-
-        /* --- Light Theme --- */
-        body.light-theme {
-            background-color: #f3f4f6; /* Light gray background */
-            color: #1f2937;
-        }
-
-        body.light-theme .card {
-            background-color: rgba(255, 255, 255, 0.5);
-            border-color: #d1d5db; /* gray-300 */
-        }
-
-        body.light-theme .form-input, body.light-theme .form-select {
-            background-color: #ffffff;
-            border-color: #d1d5db;
-            color: #111827;
-        }
-
-        body.light-theme .header-text { color: #111827; }
-        body.light-theme .subheader-text { color: #4b5563; } /* gray-600 */
-        body.light-theme .barcode-display-bg { background-color: #e5e7eb; border-color: #d1d5db; }
-        body.light-theme .message-box-bg { background-color: #ffffff; color: #1f2937; }
-
-
-        /* Sparkle container */
-        .sparkle-container {
+        /* Ambient Background */
+        .ambient-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             pointer-events: none;
-            z-index: -1;
+            z-index: 0;
+            overflow: hidden;
         }
-
-        /* Individual sparkle element */
-        .sparkle {
+        .ambient-orb {
             position: absolute;
-            width: 3px;
-            height: 3px;
-            background-color: white;
             border-radius: 50%;
-            opacity: 0;
-            animation: sparkle-animation 3s infinite;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
         }
-        
-        body.light-theme .sparkle {
-            background-color: #4b5563;
+        .ambient-orb:nth-child(1) {
+            width: 500px; height: 500px;
+            background: var(--accent-primary);
+            top: -10%; left: -5%;
+            animation-delay: 0s;
+        }
+        .ambient-orb:nth-child(2) {
+            width: 400px; height: 400px;
+            background: #8b5cf6;
+            bottom: -10%; right: -5%;
+            animation-delay: -7s;
+        }
+        .ambient-orb:nth-child(3) {
+            width: 300px; height: 300px;
+            background: var(--accent-info);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
         }
 
-        @keyframes sparkle-animation {
-            0% { transform: scale(0) rotate(0deg); opacity: 0; }
-            50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
-            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        /* Layout */
+        .app-shell { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px) saturate(1.2);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        /* Card hover effect */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+        }
+        .logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .top-bar-actions { display: flex; align-items: center; gap: 8px; }
+
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px 60px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeUp 0.6s ease-out;
+        }
+        .hero h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card */
         .card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: border-color var(--transition-base), box-shadow var(--transition-base);
+        }
+        .card:hover {
+            border-color: var(--border-default);
+            box-shadow: var(--shadow-md);
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
-        
-        /* Custom modal for alerts */
-        #message-box {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        .card-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-header h2 i { width: 18px; height: 18px; color: var(--text-tertiary); }
+
+        .card-body { padding: 24px; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 2px;
+            padding: 4px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+        .tab.active {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .tab i { width: 15px; height: 15px; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 20px; }
+        .form-group:last-child { margin-bottom: 0; }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .form-label span {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .form-label .hint {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-primary-subtle);
+        }
+        input::placeholder, textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+        textarea { resize: vertical; min-height: 100px; font-family: var(--font-mono); font-size: 13px; }
+
+        /* Color Input */
+        .color-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+        }
+        .color-input-group:focus-within {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--accent-primary-subtle);
+        }
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border-default);
+            cursor: pointer;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .color-swatch input[type="color"] {
+            width: 48px;
+            height: 48px;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            margin: -8px;
+        }
+        .color-hex {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            outline: none;
+            padding: 4px 0;
+        }
+
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+        @media (max-width: 640px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            line-height: 1;
+        }
+        .btn i { width: 16px; height: 16px; }
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+        .btn-primary:hover { background: var(--accent-primary-hover); box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4); }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-default);
+        }
+        .btn-secondary:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+        .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        .btn-danger {
+            background: var(--accent-danger-subtle);
+            color: var(--accent-danger);
+        }
+        .btn-danger:hover { background: var(--accent-danger); color: white; }
+
+        .btn-success {
+            background: var(--accent-success);
+            color: white;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+        .btn-success:hover { box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4); }
+
+        .btn-sm { padding: 7px 12px; font-size: 12px; }
+        .btn-sm i { width: 14px; height: 14px; }
+
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* Icon Button */
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        .btn-icon:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-default); }
+        .btn-icon i { width: 16px; height: 16px; }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .badge-primary { background: var(--accent-primary-subtle); color: var(--accent-primary); }
+        .badge-success { background: var(--accent-success-subtle); color: var(--accent-success); }
+        .badge-warning { background: var(--accent-warning-subtle); color: var(--accent-warning); }
+        .badge-danger { background: var(--accent-danger-subtle); color: var(--accent-danger); }
+        .badge-info { background: var(--accent-info-subtle); color: var(--accent-info); }
+
+        /* Barcode Preview */
+        .barcode-preview {
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 220px;
+            position: relative;
+            transition: all var(--transition-base);
+        }
+        .barcode-preview.has-barcode {
+            border-style: solid;
+            border-color: var(--border-subtle);
+            background: white;
+        }
+        .barcode-preview canvas,
+        .barcode-preview svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .barcode-preview .placeholder {
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+        .barcode-preview .placeholder i {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 12px;
+            opacity: 0.4;
+        }
+        .barcode-preview .placeholder p { font-size: 14px; }
+        .barcode-preview .placeholder .sub { font-size: 12px; margin-top: 4px; }
+
+        /* Barcode Info */
+        .barcode-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            margin-top: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .barcode-info .info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .barcode-info .info-item i { width: 14px; height: 14px; color: var(--text-tertiary); }
+        .barcode-info .separator {
+            width: 1px;
+            height: 16px;
+            background: var(--border-default);
+        }
+
+        /* Format Chips */
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .format-chip {
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: left;
+        }
+        .format-chip:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+        .format-chip.active {
+            border-color: var(--accent-primary);
+            background: var(--accent-primary-subtle);
+        }
+        .format-chip .format-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .format-chip .format-desc {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            display: block;
+        }
+
+        /* Batch List */
+        .batch-list {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-default) transparent;
+        }
+        .batch-list::-webkit-scrollbar { width: 6px; }
+        .batch-list::-webkit-scrollbar-track { background: transparent; }
+        .batch-list::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+
+        .batch-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background var(--transition-fast);
+        }
+        .batch-item:hover { background: var(--bg-hover); }
+        .batch-item:last-child { border-bottom: none; }
+        .batch-item .batch-preview {
+            width: 48px;
+            height: 36px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .batch-item .batch-preview canvas { max-width: 100%; max-height: 100%; }
+        .batch-item .batch-data {
+            flex: 1;
+            min-width: 0;
+        }
+        .batch-item .batch-data .data-text {
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .batch-item .batch-data .data-type {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+        .batch-item .batch-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+        .batch-item:hover .batch-actions { opacity: 1; }
+
+        /* History */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        .history-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .history-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-2px);
+        }
+        .history-card .hc-preview {
+            width: 100%;
+            height: 80px;
+            background: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .history-card .hc-preview canvas,
+        .history-card .hc-preview svg { max-width: 100%; max-height: 100%; }
+        .history-card .hc-data {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .history-card .hc-meta {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            font-size: 13px;
+            font-weight: 500;
+            animation: toastIn 0.3s ease-out;
+            max-width: 360px;
+        }
+        .toast.toast-out { animation: toastOut 0.2s ease-in forwards; }
+        .toast i { width: 18px; height: 18px; flex-shrink: 0; }
+        .toast.success i { color: var(--accent-success); }
+        .toast.error i { color: var(--accent-danger); }
+        .toast.info i { color: var(--accent-info); }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(12px) scale(0.95); }
+        }
+
+        /* Keyboard Shortcut */
+        kbd {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-default);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-tertiary);
+            line-height: 1;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-tertiary);
+        }
+        .empty-state i { width: 40px; height: 40px; margin: 0 auto 12px; opacity: 0.3; }
+        .empty-state p { font-size: 13px; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-base);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.95) translateY(8px);
+            transition: transform var(--transition-slow);
+        }
+        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h3 { font-size: 16px; font-weight: 600; }
+        .modal-body { padding: 24px; }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* Shortcuts Modal */
+        .shortcut-list { display: flex; flex-direction: column; gap: 12px; }
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        .shortcut-item span { font-size: 13px; color: var(--text-secondary); }
+        .shortcut-item .keys { display: flex; gap: 4px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .top-bar { padding: 0 16px; }
+            .main-content { padding: 20px 16px 40px; }
+            .card-body { padding: 16px; }
+            .card-header { padding: 14px 16px; }
+            .grid-2 { gap: 12px; }
+            .barcode-preview { padding: 20px; min-height: 160px; }
+            .format-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+        }
+
+        /* Print Styles */
+        @media print {
+            .top-bar, .ambient-bg, .toast-container, .btn, .tabs, .form-group, .card-header { display: none !important; }
+            body { background: white; }
+            .card { border: none; box-shadow: none; }
+            .barcode-preview { border: none; background: white; padding: 0; }
+            .main-content { max-width: 100%; padding: 0; }
+        }
+
+        /* Focus Visible */
+        :focus-visible {
+            outline: 2px solid var(--border-focus);
+            outline-offset: 2px;
+        }
+        button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid var(--border-focus);
+            outline-offset: 2px;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-default);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+        /* Separator */
+        .separator {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 20px 0;
+        }
+
+        /* Visually Hidden (a11y) */
+        .sr-only {
+            position: absolute; width: 1px; height: 1px;
+            padding: 0; margin: -1px; overflow: hidden;
+            clip: rect(0,0,0,0); white-space: nowrap; border: 0;
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
+    <!-- Ambient Background -->
+    <div class="ambient-bg" aria-hidden="true">
+        <div class="ambient-orb"></div>
+        <div class="ambient-orb"></div>
+        <div class="ambient-orb"></div>
+    </div>
 
-    <!-- Sparkle background container -->
-    <div class="sparkle-container" id="sparkle-container"></div>
-    
-    <!-- Theme Toggle Button -->
-    <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full bg-gray-500/30 backdrop-blur-sm text-white hover:bg-gray-500/50 transition-colors">
-        <!-- Sun Icon -->
-        <svg id="theme-icon-sun" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-        <!-- Moon Icon -->
-        <svg id="theme-icon-moon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-    </button>
+    <div class="app-shell">
+        <!-- Top Bar -->
+        <header class="top-bar" role="banner">
+            <div class="logo">
+                <div class="logo-icon" aria-hidden="true"><i data-lucide="scan-barcode"></i></div>
+                <span>BarCode Studio</span>
+                <span class="badge badge-primary">PRO</span>
+            </div>
+            <div class="top-bar-actions">
+                <button class="btn-icon" id="shortcuts-btn" title="Keyboard Shortcuts" aria-label="Keyboard Shortcuts">
+                    <i data-lucide="keyboard"></i>
+                </button>
+                <button class="btn-icon" id="theme-toggle" title="Toggle Theme" aria-label="Toggle Theme">
+                    <i data-lucide="moon" id="theme-icon-moon"></i>
+                    <i data-lucide="sun" id="theme-icon-sun" style="display:none"></i>
+                </button>
+            </div>
+        </header>
 
-    <div class="relative min-h-screen w-full flex items-center justify-center p-4">
-        <div class="w-full max-w-2xl">
-            <header class="text-center mb-8">
-                <h1 class="text-4xl md:text-5xl font-bold header-text tracking-tight">Barcode Generator</h1>
-                <p class="text-lg subheader-text mt-2">Create and customize barcodes in real-time.</p>
-            </header>
+        <!-- Main Content -->
+        <main class="main-content" role="main">
+            <!-- Hero -->
+            <section class="hero">
+                <h1>Professional Barcode Generator</h1>
+                <p>Generate, customize, and export barcodes in multiple formats. Enterprise-grade tool for all your labeling needs.</p>
+            </section>
 
-            <main class="card rounded-2xl shadow-2xl p-6 md:p-8 border">
-                <!-- Input Section -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div>
-                        <label for="barcode-data" class="block text-sm font-medium mb-2">Data</label>
-                        <input type="text" id="barcode-data" class="form-input w-full rounded-lg p-3" placeholder="Enter text or numbers" value="1234567890">
+            <!-- Tabs -->
+            <div class="tabs" role="tablist">
+                <button class="tab active" data-tab="single" role="tab" aria-selected="true">
+                    <i data-lucide="scan"></i> Single
+                </button>
+                <button class="tab" data-tab="batch" role="tab" aria-selected="false">
+                    <i data-lucide="layers"></i> Batch
+                </button>
+                <button class="tab" data-tab="history" role="tab" aria-selected="false">
+                    <i data-lucide="history"></i> History
+                </button>
+            </div>
+
+            <!-- Single Tab -->
+            <div class="tab-content" id="tab-single">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+                    <!-- Left: Controls -->
+                    <div class="card" style="animation: fadeUp 0.6s ease-out 0.1s both;">
+                        <div class="card-header">
+                            <h2><i data-lucide="settings-2"></i> Configuration</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Format Selection -->
+                            <div class="form-group">
+                                <div class="form-label">
+                                    <span>Barcode Format</span>
+                                    <span class="hint" id="format-hint">1D linear barcode</span>
+                                </div>
+                                <div class="format-grid" id="format-grid" role="radiogroup" aria-label="Barcode format selection">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <!-- Data Input -->
+                            <div class="form-group">
+                                <label class="form-label" for="barcode-data">
+                                    <span>Data Content</span>
+                                    <span class="hint" id="data-constraint"></span>
+                                </label>
+                                <input type="text" id="barcode-data" placeholder="Enter text, numbers, or URL" value="1234567890" autocomplete="off" spellcheck="false">
+                            </div>
+
+                            <!-- Colors -->
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <div class="form-label"><span>Foreground</span></div>
+                                    <div class="color-input-group">
+                                        <div class="color-swatch">
+                                            <input type="color" id="bar-color" value="#000000" aria-label="Foreground color">
+                                        </div>
+                                        <input type="text" class="color-hex" id="bar-color-hex" value="#000000" maxlength="7" aria-label="Foreground color hex value">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="form-label"><span>Background</span></div>
+                                    <div class="color-input-group">
+                                        <div class="color-swatch">
+                                            <input type="color" id="bg-color" value="#FFFFFF" aria-label="Background color">
+                                        </div>
+                                        <input type="text" class="color-hex" id="bg-color-hex" value="#FFFFFF" maxlength="7" aria-label="Background color hex value">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Scale -->
+                            <div class="form-group">
+                                <div class="form-label">
+                                    <span>Scale</span>
+                                    <span class="hint" id="scale-value">3x</span>
+                                </div>
+                                <input type="range" id="barcode-scale" min="1" max="5" value="3" style="width:100%; accent-color: var(--accent-primary);" aria-label="Barcode scale">
+                            </div>
+
+                            <div class="separator"></div>
+
+                            <!-- Actions -->
+                            <div class="btn-group">
+                                <button class="btn btn-primary" id="download-png" style="flex:1">
+                                    <i data-lucide="download"></i> PNG
+                                </button>
+                                <button class="btn btn-secondary" id="download-svg" style="flex:1">
+                                    <i data-lucide="download"></i> SVG
+                                </button>
+                                <button class="btn btn-secondary" id="copy-btn" style="flex:1">
+                                    <i data-lucide="clipboard"></i> Copy
+                                </button>
+                                <button class="btn btn-ghost" id="print-btn" title="Print">
+                                    <i data-lucide="printer"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="barcode-type" class="block text-sm font-medium mb-2">Barcode Type</label>
-                        <select id="barcode-type" class="form-select w-full rounded-lg p-3">
-                            <option value="qrcode">QR Code</option>
-                            <option value="code128" selected>Code 128</option>
-                            <option value="ean13">EAN-13</option>
-                            <option value="upca">UPC-A</option>
-                            <option value="datamatrix">Data Matrix</option>
-                            <option value="pdf417">PDF417</option>
-                            <option value="itf">ITF</option>
-                            <option value="codabar">Codabar</option>
-                        </select>
+
+                    <!-- Right: Preview -->
+                    <div class="card" style="animation: fadeUp 0.6s ease-out 0.2s both;">
+                        <div class="card-header">
+                            <h2><i data-lucide="eye"></i> Preview</h2>
+                            <span class="badge badge-success" id="status-badge">Ready</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="barcode-preview" id="barcode-output">
+                                <canvas id="barcode-canvas" style="display:none"></canvas>
+                                <div class="placeholder" id="placeholder">
+                                    <i data-lucide="scan-barcode"></i>
+                                    <p>Enter data to generate</p>
+                                    <p class="sub">Barcode will appear here</p>
+                                </div>
+                                <p id="error-message" class="sr-only" role="alert"></p>
+                            </div>
+                            <div class="barcode-info" id="barcode-info" style="display:none">
+                                <div class="info-item">
+                                    <i data-lucide="hash"></i>
+                                    <span id="info-type">Code 128</span>
+                                </div>
+                                <div class="separator"></div>
+                                <div class="info-item">
+                                    <i data-lucide="type"></i>
+                                    <span id="info-length">10 chars</span>
+                                </div>
+                                <div class="separator"></div>
+                                <div class="info-item">
+                                    <i data-lucide="maximize"></i>
+                                    <span id="info-dimensions">--</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Customization Section -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div>
-                        <label for="bar-color" class="block text-sm font-medium mb-2">Bar Color</label>
-                        <input type="color" id="bar-color" class="w-full h-12 rounded-lg p-1" value="#000000">
+            <!-- Batch Tab -->
+            <div class="tab-content" id="tab-batch" style="display:none;">
+                <div class="card" style="animation: fadeUp 0.4s ease-out;">
+                    <div class="card-header">
+                        <h2><i data-lucide="layers"></i> Batch Generator</h2>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-secondary" id="batch-add-sample">
+                                <i data-lucide="plus"></i> Add Sample
+                            </button>
+                            <button class="btn btn-sm btn-danger" id="batch-clear">
+                                <i data-lucide="trash-2"></i> Clear All
+                            </button>
+                        </div>
                     </div>
-                    <div>
-                        <label for="bg-color" class="block text-sm font-medium mb-2">Background Color</label>
-                        <input type="color" id="bg-color" class="w-full h-12 rounded-lg p-1" value="#FFFFFF">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="form-label">
+                                <span>Add Items (one per line)</span>
+                                <span class="hint">Format: data | type (optional)</span>
+                            </div>
+                            <textarea id="batch-input" placeholder="1234567890 | code128&#10;PRODUCT-001 | qrcode&#10;9876543210128 | ean13"></textarea>
+                        </div>
+                        <div class="btn-group" style="margin-bottom:20px">
+                            <button class="btn btn-primary" id="batch-generate">
+                                <i data-lucide="zap"></i> Generate All
+                            </button>
+                            <button class="btn btn-secondary" id="batch-export-all">
+                                <i data-lucide="download"></i> Export All as PNG
+                            </button>
+                        </div>
+                        <div class="batch-list" id="batch-list">
+                            <div class="empty-state">
+                                <i data-lucide="inbox"></i>
+                                <p>No batch items yet. Add data above and click Generate.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Barcode Display Area -->
-                <div id="barcode-output" class="barcode-display-bg rounded-lg p-6 flex items-center justify-center min-h-[200px] border">
-                    <canvas id="barcode-canvas"></canvas>
-                    <p id="error-message" class="text-red-400 text-center hidden"></p>
+            <!-- History Tab -->
+            <div class="tab-content" id="tab-history" style="display:none;">
+                <div class="card" style="animation: fadeUp 0.4s ease-out;">
+                    <div class="card-header">
+                        <h2><i data-lucide="clock"></i> Generation History</h2>
+                        <button class="btn btn-sm btn-danger" id="history-clear">
+                            <i data-lucide="trash-2"></i> Clear
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="history-grid" id="history-grid">
+                            <div class="empty-state" style="grid-column: 1/-1">
+                                <i data-lucide="clock"></i>
+                                <p>No history yet. Generated barcodes will appear here.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </main>
+    </div>
 
-                <!-- Action Buttons -->
-                <div class="mt-8 flex flex-col md:flex-row gap-4 justify-center">
-                    <button id="download-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 w-full md:w-auto">
-                        Download PNG
-                    </button>
-                    <button id="copy-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 w-full md:w-auto">
-                        Copy to Clipboard
-                    </button>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <!-- Shortcuts Modal -->
+    <div class="modal-overlay" id="shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="shortcuts-title">Keyboard Shortcuts</h3>
+                <button class="btn-icon" id="close-shortcuts" aria-label="Close"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcut-list">
+                    <div class="shortcut-item">
+                        <span>Generate barcode</span>
+                        <div class="keys"><kbd>Ctrl</kbd><kbd>Enter</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span>Download PNG</span>
+                        <div class="keys"><kbd>Ctrl</kbd><kbd>S</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span>Copy to clipboard</span>
+                        <div class="keys"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>C</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span>Toggle theme</span>
+                        <div class="keys"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>T</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span>Focus data input</span>
+                        <div class="keys"><kbd>/</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span>Switch to Single</span>
+                        <div class="keys"><kbd>1</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span>Switch to Batch</span>
+                        <div class="keys"><kbd>2</kbd></div>
+                    </div>
+                    <div class="shortcut-item">
+                        <span>Switch to History</span>
+                        <div class="keys"><kbd>3</kbd></div>
+                    </div>
                 </div>
-            </main>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="close-shortcuts-btn">Close</button>
+            </div>
         </div>
     </div>
-    
-    <!-- Custom Message Box -->
-    <div id="message-box" class="message-box-bg fixed bottom-5 right-5 py-3 px-5 rounded-lg shadow-xl opacity-0 transform translate-y-2 pointer-events-none">
-        <p id="message-text"></p>
-    </div>
-
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Element References ---
-            const dataInput = document.getElementById('barcode-data');
-            const typeSelect = document.getElementById('barcode-type');
-            const barColorInput = document.getElementById('bar-color');
-            const bgColorInput = document.getElementById('bg-color');
-            const canvas = document.getElementById('barcode-canvas');
-            const errorMessage = document.getElementById('error-message');
-            const downloadBtn = document.getElementById('download-btn');
-            const copyBtn = document.getElementById('copy-btn');
-            const sparkleContainer = document.getElementById('sparkle-container');
-            const messageBox = document.getElementById('message-box');
-            const messageText = document.getElementById('message-text');
-            const themeToggleBtn = document.getElementById('theme-toggle');
-            const sunIcon = document.getElementById('theme-icon-sun');
-            const moonIcon = document.getElementById('theme-icon-moon');
+    (() => {
+        'use strict';
 
-            // --- Theme Management ---
-            const applyTheme = (theme) => {
-                if (theme === 'light') {
-                    document.body.classList.add('light-theme');
-                    sunIcon.classList.add('hidden');
-                    moonIcon.classList.remove('hidden');
-                } else {
-                    document.body.classList.remove('light-theme');
-                    sunIcon.classList.remove('hidden');
-                    moonIcon.classList.add('hidden');
+        // --- Barcode Format Definitions ---
+        const FORMATS = [
+            { id: 'code128', name: 'Code 128', desc: 'Universal 1D', group: '1d', hint: '1D linear — letters, numbers, symbols', constraint: 'ASCII 0-127' },
+            { id: 'qrcode', name: 'QR Code', desc: '2D matrix', group: '2d', hint: '2D matrix — up to 7000 chars', constraint: 'Up to 4296 alphanumeric' },
+            { id: 'ean13', name: 'EAN-13', desc: 'Retail standard', group: '1d', hint: '1D linear — 12-13 digit number', constraint: '12 or 13 digits' },
+            { id: 'upca', name: 'UPC-A', desc: 'US retail', group: '1d', hint: '1D linear — 11-12 digit number', constraint: '11 or 12 digits' },
+            { id: 'ean8', name: 'EAN-8', desc: 'Compact retail', group: '1d', hint: '1D linear — 7-8 digit number', constraint: '7 or 8 digits' },
+            { id: 'upce', name: 'UPC-E', desc: 'Condensed UPC', group: '1d', hint: '1D linear — 6-8 digit number', constraint: '6-8 digits' },
+            { id: 'datamatrix', name: 'Data Matrix', desc: '2D compact', group: '2d', hint: '2D matrix — small items, high density', constraint: 'Up to 3116 numeric' },
+            { id: 'pdf417', name: 'PDF417', desc: '2D stacked', group: '2d', hint: '2D stacked — IDs, transport', constraint: 'Up to 1850 text' },
+            { id: 'itf', name: 'ITF', desc: 'Shipping', group: '1d', hint: '1D linear — even-length digits only', constraint: 'Even number of digits' },
+            { id: 'codabar', name: 'Codabar', desc: 'Libraries', group: '1d', hint: '1D linear — digits and - $ : / . +', constraint: '0-9, -, $, :, /, ., +' },
+            { id: 'code39', name: 'Code 39', desc: 'Industrial', group: '1d', hint: '1D linear — uppercase + digits + symbols', constraint: 'A-Z, 0-9, symbols' },
+            { id: 'gs1', name: 'GS1-128', desc: 'Shipping labels', group: '1d', hint: '1D linear — GS1 application identifiers', constraint: 'GS1 AI format' },
+            { id: 'aztec', name: 'Aztec', desc: 'Tickets', group: '2d', hint: '2D matrix — transport, tickets', constraint: 'Up to 3067 numeric' },
+            { id: 'maxicode', name: 'MaxiCode', desc: 'UPS codes', group: '2d', hint: '2D — used by UPS for tracking', constraint: '93 characters' },
+            { id: 'hanxin', name: 'Han Xin', desc: 'Chinese standard', group: '2d', hint: '2D matrix — Chinese GB standards', constraint: 'Chinese characters' },
+        ];
+
+        // --- State ---
+        let currentFormat = 'code128';
+        let batchItems = [];
+        let history = JSON.parse(localStorage.getItem('barcode-history') || '[]');
+        let debounceTimer = null;
+
+        // --- DOM Refs ---
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        const dataInput = $('#barcode-data');
+        const canvas = $('#barcode-canvas');
+        const placeholder = $('#placeholder');
+        const errorMessage = $('#error-message');
+        const barcodeOutput = $('#barcode-output');
+        const barcodeInfo = $('#barcode-info');
+        const formatGrid = $('#format-grid');
+        const formatHint = $('#format-hint');
+        const dataConstraint = $('#data-constraint');
+        const scaleSlider = $('#barcode-scale');
+        const scaleValue = $('#scale-value');
+        const statusBadge = $('#status-badge');
+        const toastContainer = $('#toast-container');
+
+        // --- Initialize Format Grid ---
+        function initFormatGrid() {
+            const groups = { '1d': '1D Barcodes', '2d': '2D Barcodes' };
+            let html = '';
+            for (const [group, label] of Object.entries(groups)) {
+                const formats = FORMATS.filter(f => f.group === group);
+                if (formats.length === 0) continue;
+                for (const fmt of formats) {
+                    const active = fmt.id === currentFormat ? ' active' : '';
+                    html += `<div class="format-chip${active}" data-format="${fmt.id}" role="radio" aria-checked="${fmt.id === currentFormat}" tabindex="0">
+                        <span class="format-name">${fmt.name}</span>
+                        <span class="format-desc">${fmt.desc}</span>
+                    </div>`;
                 }
-            };
-            
-            themeToggleBtn.addEventListener('click', () => {
-                const isLight = document.body.classList.toggle('light-theme');
-                const newTheme = isLight ? 'light' : 'dark';
-                localStorage.setItem('barcode-theme', newTheme);
-                applyTheme(newTheme);
-            });
+            }
+            formatGrid.innerHTML = html;
 
-            // --- Sparkle Effect ---
-            const createSparkles = () => {
-                const sparkleCount = 50;
-                for (let i = 0; i < sparkleCount; i++) {
-                    const sparkle = document.createElement('div');
-                    sparkle.className = 'sparkle';
-                    sparkle.style.top = `${Math.random() * 100}%`;
-                    sparkle.style.left = `${Math.random() * 100}%`;
-                    sparkle.style.animationDuration = `${Math.random() * 2 + 2}s`;
-                    sparkle.style.animationDelay = `${Math.random() * 2}s`;
-                    sparkleContainer.appendChild(sparkle);
-                }
-            };
-
-            // --- Custom Message/Alert Function ---
-            const showMessage = (text, duration = 3000) => {
-                messageText.textContent = text;
-                messageBox.classList.remove('opacity-0', 'translate-y-2');
-                messageBox.classList.add('opacity-100', 'translate-y-0');
-                setTimeout(() => {
-                    messageBox.classList.remove('opacity-100', 'translate-y-0');
-                    messageBox.classList.add('opacity-0', 'translate-y-2');
-                }, duration);
-            };
-
-            // --- Barcode Generation Logic ---
-            const generateBarcode = () => {
-                const data = dataInput.value;
-                const type = typeSelect.value;
-                const barColor = barColorInput.value.substring(1);
-                const bgColor = bgColorInput.value.substring(1);
-
-                if (!data) {
-                    canvas.style.display = 'none';
-                    errorMessage.style.display = 'block';
-                    errorMessage.textContent = 'Please enter data to generate a barcode.';
-                    return;
-                }
-
-                try {
-                    bwipjs.toCanvas(canvas, {
-                        bcid: type, text: data, scale: 3, height: 10,
-                        includetext: true, textxalign: 'center',
-                        barcolor: barColor, backgroundcolor: bgColor
-                    });
-                    canvas.style.display = 'block';
-                    errorMessage.style.display = 'none';
-                } catch (e) {
-                    canvas.style.display = 'none';
-                    errorMessage.style.display = 'block';
-                    errorMessage.textContent = `Error: ${e.message || 'Invalid data for this barcode type.'}`;
-                }
-            };
-
-            // --- Event Listeners ---
-            dataInput.addEventListener('input', generateBarcode);
-            typeSelect.addEventListener('change', generateBarcode);
-            barColorInput.addEventListener('input', generateBarcode);
-            bgColorInput.addEventListener('input', generateBarcode);
-
-            downloadBtn.addEventListener('click', () => {
-                if (canvas.style.display === 'none') {
-                    showMessage('Cannot download, no barcode generated.');
-                    return;
-                }
-                const link = document.createElement('a');
-                link.download = `${typeSelect.value}-${dataInput.value}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                showMessage('Download started!');
-            });
-
-            copyBtn.addEventListener('click', () => {
-                if (canvas.style.display === 'none') {
-                    showMessage('Cannot copy, no barcode generated.');
-                    return;
-                }
-                canvas.toBlob((blob) => {
-                    try {
-                        navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
-                        showMessage('Barcode copied to clipboard!');
-                    } catch (error) {
-                         console.error('Copy failed', error);
-                         showMessage('Copy failed. Your browser may not support this feature.', 4000);
+            formatGrid.querySelectorAll('.format-chip').forEach(chip => {
+                chip.addEventListener('click', () => selectFormat(chip.dataset.format));
+                chip.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectFormat(chip.dataset.format);
                     }
                 });
             });
+        }
 
-            // --- Initial Setup ---
-            createSparkles();
+        function selectFormat(fmtId) {
+            currentFormat = fmtId;
+            const fmt = FORMATS.find(f => f.id === fmtId);
+            formatGrid.querySelectorAll('.format-chip').forEach(c => {
+                const active = c.dataset.format === fmtId;
+                c.classList.toggle('active', active);
+                c.setAttribute('aria-checked', active);
+            });
+            if (fmt) {
+                formatHint.textContent = fmt.hint;
+                dataConstraint.textContent = fmt.constraint;
+            }
             generateBarcode();
-            const savedTheme = localStorage.getItem('barcode-theme') || 'dark';
-            applyTheme(savedTheme);
-        });
-    </script>
+        }
 
+        // --- Barcode Generation ---
+        function generateBarcode() {
+            const data = dataInput.value.trim();
+            if (!data) {
+                canvas.style.display = 'none';
+                placeholder.style.display = '';
+                barcodeInfo.style.display = 'none';
+                barcodeOutput.classList.remove('has-barcode');
+                statusBadge.textContent = 'Empty';
+                statusBadge.className = 'badge badge-warning';
+                return;
+            }
+
+            const scale = parseInt(scaleSlider.value);
+            const barColor = $('#bar-color').value;
+            const bgColor = $('#bg-color').value;
+
+            try {
+                bwipjs.toCanvas(canvas, {
+                    bcid: currentFormat,
+                    text: data,
+                    scale: scale,
+                    height: 10,
+                    includetext: true,
+                    textxalign: 'center',
+                    barcolor: barColor.substring(1),
+                    backgroundcolor: bgColor.substring(1),
+                });
+
+                canvas.style.display = 'block';
+                placeholder.style.display = 'none';
+                barcodeOutput.classList.add('has-barcode');
+                errorMessage.style.display = 'none';
+
+                const fmt = FORMATS.find(f => f.id === currentFormat);
+                $('#info-type').textContent = fmt ? fmt.name : currentFormat;
+                $('#info-length').textContent = `${data.length} chars`;
+                $('#info-dimensions').textContent = `${canvas.width} × ${canvas.height}px`;
+                barcodeInfo.style.display = 'flex';
+
+                statusBadge.textContent = 'Generated';
+                statusBadge.className = 'badge badge-success';
+
+                addToHistory(data, currentFormat, canvas);
+            } catch (e) {
+                canvas.style.display = 'none';
+                placeholder.style.display = '';
+                barcodeInfo.style.display = 'none';
+                barcodeOutput.classList.remove('has-barcode');
+                errorMessage.textContent = e.message || 'Invalid data for this barcode type.';
+                errorMessage.style.display = 'block';
+                statusBadge.textContent = 'Error';
+                statusBadge.className = 'badge badge-danger';
+            }
+        }
+
+        // --- Debounced Generation ---
+        function debouncedGenerate() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(generateBarcode, 200);
+        }
+
+        // --- History ---
+        function addToHistory(data, format, cvs) {
+            const entry = {
+                id: Date.now(),
+                data,
+                format,
+                timestamp: new Date().toISOString(),
+                dataUrl: cvs.toDataURL('image/png'),
+            };
+            history.unshift(entry);
+            if (history.length > 50) history = history.slice(0, 50);
+            localStorage.setItem('barcode-history', JSON.stringify(history));
+        }
+
+        function renderHistory() {
+            const grid = $('#history-grid');
+            if (history.length === 0) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i data-lucide="clock"></i><p>No history yet. Generated barcodes will appear here.</p></div>`;
+                lucide.createIcons({ nodes: grid.querySelectorAll('[data-lucide]') });
+                return;
+            }
+            grid.innerHTML = history.map(h => `
+                <div class="history-card" data-id="${h.id}" tabindex="0" role="button" aria-label="Load barcode: ${h.data}">
+                    <div class="hc-preview"><img src="${h.dataUrl}" alt="${h.data}" style="max-width:100%;max-height:100%"></div>
+                    <div class="hc-data" title="${h.data}">${h.data}</div>
+                    <div class="hc-meta">
+                        <span>${FORMATS.find(f=>f.id===h.format)?.name || h.format}</span>
+                        <span>${new Date(h.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            grid.querySelectorAll('.history-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const entry = history.find(h => h.id === parseInt(card.dataset.id));
+                    if (entry) {
+                        dataInput.value = entry.data;
+                        selectFormat(entry.format);
+                        switchTab('single');
+                    }
+                });
+            });
+        }
+
+        // --- Batch ---
+        function renderBatchList() {
+            const list = $('#batch-list');
+            if (batchItems.length === 0) {
+                list.innerHTML = `<div class="empty-state"><i data-lucide="inbox"></i><p>No batch items yet. Add data above and click Generate.</p></div>`;
+                lucide.createIcons({ nodes: list.querySelectorAll('[data-lucide]') });
+                return;
+            }
+            list.innerHTML = batchItems.map((item, i) => `
+                <div class="batch-item">
+                    <div class="batch-preview">
+                        <canvas id="batch-canvas-${i}" style="display:none"></canvas>
+                        ${item.error ? '<span style="color:var(--accent-danger);font-size:10px">Error</span>' : ''}
+                    </div>
+                    <div class="batch-data">
+                        <div class="data-text" title="${item.data}">${item.data}</div>
+                        <div class="data-type">${FORMATS.find(f=>f.id===item.format)?.name || item.format}</div>
+                    </div>
+                    <div class="batch-actions">
+                        <button class="btn-icon btn-sm" data-action="download" data-index="${i}" title="Download PNG" aria-label="Download ${item.data}">
+                            <i data-lucide="download"></i>
+                        </button>
+                        <button class="btn-icon btn-sm" data-action="remove" data-index="${i}" title="Remove" aria-label="Remove ${item.data}">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons({ nodes: list.querySelectorAll('[data-lucide]') });
+
+            // Generate canvases
+            batchItems.forEach((item, i) => {
+                if (item.error) return;
+                const cvs = document.getElementById(`batch-canvas-${i}`);
+                if (!cvs) return;
+                try {
+                    bwipjs.toCanvas(cvs, {
+                        bcid: item.format, text: item.data, scale: 2, height: 8,
+                        includetext: true, textxalign: 'center',
+                        barcolor: '#000000', backgroundcolor: '#FFFFFF',
+                    });
+                    cvs.style.display = 'block';
+                } catch (e) {
+                    item.error = true;
+                }
+            });
+
+            // Actions
+            list.querySelectorAll('[data-action="download"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.index);
+                    downloadBatchItem(idx);
+                });
+            });
+            list.querySelectorAll('[data-action="remove"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    batchItems.splice(parseInt(btn.dataset.index), 1);
+                    renderBatchList();
+                });
+            });
+        }
+
+        function downloadBatchItem(idx) {
+            const cvs = document.getElementById(`batch-canvas-${idx}`);
+            if (!cvs || cvs.style.display === 'none') return;
+            const link = document.createElement('a');
+            link.download = `barcode-${batchItems[idx].data}.png`;
+            link.href = cvs.toDataURL('image/png');
+            link.click();
+        }
+
+        // --- Tabs ---
+        function switchTab(tabId) {
+            $$('.tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tabId);
+                t.setAttribute('aria-selected', t.dataset.tab === tabId);
+            });
+            $$('.tab-content').forEach(c => c.style.display = 'none');
+            const target = $(`#tab-${tabId}`);
+            if (target) target.style.display = '';
+            if (tabId === 'history') renderHistory();
+        }
+
+        // --- Theme ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('barcode-theme', next);
+
+            const moon = $('#theme-icon-moon');
+            const sun = $('#theme-icon-sun');
+            if (next === 'light') {
+                moon.style.display = 'none';
+                sun.style.display = '';
+            } else {
+                moon.style.display = '';
+                sun.style.display = 'none';
+            }
+        }
+
+        // --- Toast ---
+        function showToast(message, type = 'info') {
+            const icons = { success: 'check-circle', error: 'alert-circle', info: 'info' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i data-lucide="${icons[type] || 'info'}"></i><span>${message}</span>`;
+            toastContainer.appendChild(toast);
+            lucide.createIcons({ nodes: toast.querySelectorAll('[data-lucide]') });
+            setTimeout(() => {
+                toast.classList.add('toast-out');
+                setTimeout(() => toast.remove(), 200);
+            }, 3000);
+        }
+
+        // --- Download PNG ---
+        function downloadPNG() {
+            if (canvas.style.display === 'none') {
+                showToast('No barcode to download', 'error');
+                return;
+            }
+            const link = document.createElement('a');
+            link.download = `barcode-${currentFormat}-${dataInput.value}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showToast('PNG downloaded', 'success');
+        }
+
+        // --- Download SVG ---
+        function downloadSVG() {
+            if (canvas.style.display === 'none') {
+                showToast('No barcode to download', 'error');
+                return;
+            }
+            const data = dataInput.value.trim();
+            const barColor = $('#bar-color').value;
+            const bgColor = $('#bg-color').value;
+            try {
+                const svgStr = bwipjs.toSVG({
+                    bcid: currentFormat,
+                    text: data,
+                    scale: 3,
+                    height: 10,
+                    includetext: true,
+                    textxalign: 'center',
+                    barcolor: barColor.substring(1),
+                    backgroundcolor: bgColor.substring(1),
+                });
+                const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = `barcode-${currentFormat}-${data}.svg`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast('SVG downloaded', 'success');
+            } catch (e) {
+                showToast('Failed to export SVG: ' + e.message, 'error');
+            }
+        }
+
+        // --- Copy ---
+        async function copyToClipboard() {
+            if (canvas.style.display === 'none') {
+                showToast('No barcode to copy', 'error');
+                return;
+            }
+            try {
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                showToast('Copied to clipboard', 'success');
+            } catch (e) {
+                showToast('Copy failed — try downloading instead', 'error');
+            }
+        }
+
+        // --- Print ---
+        function printBarcode() {
+            if (canvas.style.display === 'none') {
+                showToast('No barcode to print', 'error');
+                return;
+            }
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`<!DOCTYPE html><html><head><title>Print Barcode</title><style>body{display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}img{max-width:100%;}</style></head><body><img src="${canvas.toDataURL('image/png')}" onload="window.print();window.close()"></body></html>`);
+            printWindow.document.close();
+        }
+
+        // --- Keyboard Shortcuts ---
+        document.addEventListener('keydown', (e) => {
+            const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+
+            if (e.key === 'Escape') {
+                const modal = $('#shortcuts-modal');
+                if (modal.classList.contains('active')) {
+                    modal.classList.remove('active');
+                    return;
+                }
+            }
+
+            if (isInput) return;
+
+            if (e.key === '/') {
+                e.preventDefault();
+                dataInput.focus();
+                dataInput.select();
+            }
+            if (e.key === '1') switchTab('single');
+            if (e.key === '2') switchTab('batch');
+            if (e.key === '3') switchTab('history');
+
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                generateBarcode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                downloadPNG();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                copyToClipboard();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'T' || e.key === 't')) {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+
+        // --- Event Bindings ---
+        dataInput.addEventListener('input', debouncedGenerate);
+        $('#barcode-scale').addEventListener('input', () => {
+            scaleValue.textContent = `${scaleSlider.value}x`;
+            generateBarcode();
+        });
+
+        // Color inputs
+        function syncColor(type) {
+            const colorInput = $(`#${type}-color`);
+            const hexInput = $(`#${type}-color-hex`);
+            hexInput.value = colorInput.value;
+            generateBarcode();
+        }
+        $('#bar-color').addEventListener('input', () => syncColor('bar'));
+        $('#bg-color').addEventListener('input', () => syncColor('bg'));
+        $('#bar-color-hex').addEventListener('input', (e) => {
+            const v = e.target.value;
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+                $('#bar-color').value = v;
+                generateBarcode();
+            }
+        });
+        $('#bg-color-hex').addEventListener('input', (e) => {
+            const v = e.target.value;
+            if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+                $('#bg-color').value = v;
+                generateBarcode();
+            }
+        });
+
+        // Tabs
+        $$('.tab').forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+
+        // Theme
+        $('#theme-toggle').addEventListener('click', toggleTheme);
+
+        // Actions
+        $('#download-png').addEventListener('click', downloadPNG);
+        $('#download-svg').addEventListener('click', downloadSVG);
+        $('#copy-btn').addEventListener('click', copyToClipboard);
+        $('#print-btn').addEventListener('click', printBarcode);
+
+        // Shortcuts modal
+        $('#shortcuts-btn').addEventListener('click', () => $('#shortcuts-modal').classList.add('active'));
+        $('#close-shortcuts').addEventListener('click', () => $('#shortcuts-modal').classList.remove('active'));
+        $('#close-shortcuts-btn').addEventListener('click', () => $('#shortcuts-modal').classList.remove('active'));
+        $('#shortcuts-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+        });
+
+        // Batch
+        $('#batch-generate').addEventListener('click', () => {
+            const input = $('#batch-input').value.trim();
+            if (!input) { showToast('Enter batch data first', 'error'); return; }
+            const lines = input.split('\n').filter(l => l.trim());
+            batchItems = lines.map(line => {
+                const parts = line.split('|').map(s => s.trim());
+                return { data: parts[0], format: parts[1] || currentFormat, error: false };
+            });
+            renderBatchList();
+            showToast(`Generated ${batchItems.length} barcodes`, 'success');
+        });
+
+        $('#batch-add-sample').addEventListener('click', () => {
+            const samples = [
+                '1234567890 | code128',
+                'https://example.com | qrcode',
+                '5901234123457 | ean13',
+                '012345678905 | upca',
+                'PRODUCT-001 | datamatrix',
+            ];
+            const textarea = $('#batch-input');
+            textarea.value = textarea.value ? textarea.value + '\n' + samples.join('\n') : samples.join('\n');
+            showToast('Sample data added', 'info');
+        });
+
+        $('#batch-clear').addEventListener('click', () => {
+            batchItems = [];
+            $('#batch-input').value = '';
+            renderBatchList();
+        });
+
+        $('#batch-export-all').addEventListener('click', () => {
+            if (batchItems.length === 0) { showToast('No batch items to export', 'error'); return; }
+            batchItems.forEach((_, i) => downloadBatchItem(i));
+            showToast('Exporting all barcodes...', 'info');
+        });
+
+        // History
+        $('#history-clear').addEventListener('click', () => {
+            history = [];
+            localStorage.removeItem('barcode-history');
+            renderHistory();
+            showToast('History cleared', 'info');
+        });
+
+        // --- Init ---
+        function init() {
+            const savedTheme = localStorage.getItem('barcode-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'light') {
+                $('#theme-icon-moon').style.display = 'none';
+                $('#theme-icon-sun').style.display = '';
+            }
+
+            initFormatGrid();
+            selectFormat(currentFormat);
+            generateBarcode();
+            lucide.createIcons();
+        }
+
+        // Wait for DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
 </body>
 </html>
