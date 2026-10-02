@@ -648,3 +648,7 @@ SOFTWARE.
 <p align="center">
   Made with precision. Built for professionals.
 </p>
+
+---
+
+Built by [Girish Lade](https://github.com/girishlade111) · Part of the [LadeStack](https://ladestack.in) open-source collection.
